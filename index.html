@@ -217,6 +217,10 @@
 <main id="app"></main>
 
 <script>
+// ============================================================
+// TECHNIQUE DATA — This is the only section that gets edited
+// to add new moves. Each entry: { name, steps, tips, chains, date }
+// ============================================================
 const techniques = {
   "Closed Guard": [
     {
@@ -227,31 +231,37 @@ const techniques = {
       date: "3/7/26"
     },
   ],
+
   "Open Guard": [],
   "Half Guard": [],
   "Mount": [],
+
   "Side Control": [
     {
       name: "Arm Triangle (Head and Arm Choke)",
-      steps: "From side control, use your chest/shoulder to push their near arm across their face and against their neck. Thread your choking arm under their head, connect your hands. Windshield wiper your leg over their belly, then squeeze.",
-      tips: "Works best when they're framing. Lift them up slightly and get your arm deeper under their body. Back your shoulder out then reset it under their chin. Don't sprawl - windshield wiper the leg.",
-      chains: "From: Side control, mount. To: Mount if they escape early.",
+      steps: "From side control, use your chest/shoulder to push their near arm across their face and against their neck. Thread your choking arm under their head, connect your hands (gable grip or palm-to-palm). Their arm blocks one side of the neck, your shoulder pressures the other side. Windshield wiper your leg over their belly, then squeeze.",
+      tips: "Works best when they're framing — push their arm down across their neck. Lift them up slightly and get your arm deeper under their body to create more pressure. To get your shoulder in the right spot under their chin, back it out first then reset it into place. Windshield wiper the leg over their belly to lock in the finish — don't sprawl. Keep your head low. Squeeze elbows together, not just your arms.",
+      chains: "From: Side control, mount. To: Can transition to mount if they escape early.",
       date: "3/7/26"
     },
     {
       name: "Reverse Triangle",
-      steps: "From side control, slide near-side knee up by their head. Thread leg under head/neck. Swing far leg over and lock triangle with legs around head and arm. Squeeze knees and extend hips.",
-      tips: "Control far arm first so it stays trapped. Angle toward trapped arm side for tighter finish.",
-      chains: "From: Side control, north-south. To: Armbar on trapped arm.",
+      steps: "From side control, slide your near-side knee up by their head. Thread that leg under their head/neck. Swing your far leg over and lock a triangle (figure-four) with your legs around their head and arm. Squeeze knees together and extend hips.",
+      tips: "Control their far arm first so it stays trapped inside the triangle. Use your hands to control posture while locking legs. Angle slightly toward their trapped arm side for tighter finish.",
+      chains: "From: Side control, north-south. To: Can transition to armbar on trapped arm.",
       date: "3/7/26"
     },
   ],
+
   "Back Control": [],
   "Turtle": [],
   "Standing / Takedowns": [],
   "Leg Locks": [],
   "Other": [],
 };
+// ============================================================
+// END TECHNIQUE DATA
+// ============================================================
 
 const positions = Object.keys(techniques);
 let activeFilter = "All";
@@ -261,31 +271,95 @@ function render() {
   const app = document.getElementById("app");
   const filtersEl = document.getElementById("filters");
   const statsEl = document.getElementById("stats");
+
+  // Build filter buttons
   const allPositions = ["All", ...positions];
-  filtersEl.innerHTML = allPositions.map(p => `<button class="filter-btn ${activeFilter === p ? 'active' : ''}" data-filter="${p}">${p}${p !== "All" ? ` (${techniques[p].length})` : ''}</button>`).join("");
-  filtersEl.querySelectorAll(".filter-btn").forEach(btn => { btn.addEventListener("click", () => { activeFilter = btn.dataset.filter; render(); }); });
+  filtersEl.innerHTML = allPositions.map(p =>
+    `<button class="filter-btn ${activeFilter === p ? 'active' : ''}" data-filter="${p}">${p}${p !== "All" ? ` (${techniques[p].length})` : ''}</button>`
+  ).join("");
+
+  filtersEl.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      activeFilter = btn.dataset.filter;
+      render();
+    });
+  });
+
+  // Stats
   const totalMoves = positions.reduce((sum, p) => sum + techniques[p].length, 0);
   const filledPositions = positions.filter(p => techniques[p].length > 0).length;
   statsEl.innerHTML = `<div><span>${totalMoves}</span> moves logged</div><div><span>${filledPositions}</span> of ${positions.length} positions covered</div>`;
+
+  // Filter & search
   const query = searchQuery.toLowerCase();
   let html = "";
   let visibleMoves = 0;
+
   for (const pos of positions) {
     if (activeFilter !== "All" && activeFilter !== pos) continue;
-    const moves = techniques[pos].filter(m => !query || (m.name + m.steps + m.tips + m.chains).toLowerCase().includes(query));
+
+    const moves = techniques[pos].filter(m => {
+      if (!query) return true;
+      return (m.name + m.steps + m.tips + m.chains).toLowerCase().includes(query);
+    });
+
     if (query && moves.length === 0) continue;
+
     visibleMoves += moves.length;
-    html += `<div class="position-section" id="section-${pos.replace(/[^a-z]/gi, '')}"><div class="position-header" onclick="this.parentElement.classList.toggle('collapsed')"><h2>${pos}</h2><span class="count">${moves.length} move${moves.length !== 1 ? 's' : ''}</span><span class="toggle-icon">&#9660;</span></div><div class="move-list">`;
-    if (moves.length === 0) html += `<div class="empty-state">No moves logged yet</div>`;
-    for (const m of moves) {
-      html += `<div class="move-card"><div class="move-name">${m.name} <span class="move-date">${m.date}</span></div><div class="detail-grid"><div class="detail full-width"><div class="detail-label">Steps</div><div class="detail-text">${m.steps}</div></div><div class="detail"><div class="detail-label">Key Details & Tips</div><div class="detail-text">${m.tips}</div></div><div class="detail"><div class="detail-label">Chains To / From</div><div class="detail-text">${m.chains}</div></div></div></div>`;
+
+    html += `<div class="position-section" id="section-${pos.replace(/[^a-z]/gi, '')}">
+      <div class="position-header" onclick="this.parentElement.classList.toggle('collapsed')">
+        <h2>${pos}</h2>
+        <span class="count">${moves.length} move${moves.length !== 1 ? 's' : ''}</span>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="move-list">`;
+
+    if (moves.length === 0) {
+      html += `<div class="empty-state">No moves logged yet</div>`;
     }
+
+    for (const m of moves) {
+      html += `<div class="move-card">
+        <div class="move-name">${highlight(m.name, query)} <span class="move-date">${m.date}</span></div>
+        <div class="detail-grid">
+          <div class="detail full-width">
+            <div class="detail-label">Steps</div>
+            <div class="detail-text">${highlight(m.steps, query)}</div>
+          </div>
+          <div class="detail">
+            <div class="detail-label">Key Details & Tips</div>
+            <div class="detail-text">${highlight(m.tips, query)}</div>
+          </div>
+          <div class="detail">
+            <div class="detail-label">Chains To / From</div>
+            <div class="detail-text">${highlight(m.chains, query)}</div>
+          </div>
+        </div>
+      </div>`;
+    }
+
     html += `</div></div>`;
   }
-  if (query && visibleMoves === 0) html = `<div class="empty-state">No moves matching "${searchQuery}"</div>`;
+
+  if (query && visibleMoves === 0) {
+    html = `<div class="empty-state">No moves matching "${searchQuery}"</div>`;
+  }
+
   app.innerHTML = html;
 }
-document.getElementById("search").addEventListener("input", (e) => { searchQuery = e.target.value; render(); });
+
+function highlight(text, query) {
+  if (!query) return text;
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return text.replace(regex, '<mark style="background:#ffe066;padding:0 2px;border-radius:2px">$1</mark>');
+}
+
+document.getElementById("search").addEventListener("input", (e) => {
+  searchQuery = e.target.value;
+  render();
+});
+
 render();
 </script>
 </body>
