@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BJJ Technique Journal</title>
+<style>
+  :root {
+    --dark-blue: #1B3A5C;
+    --med-blue: #2E75B6;
+    --light-blue: #D6E4F0;
+    --bg: #f7f8fa;
+    --card-bg: #ffffff;
+    --text: #333333;
+    --muted: #666666;
+    --border: #e0e0e0;
+    --accent: #2E75B6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  header {
+    background: var(--dark-blue);
+    color: white;
+    padding: 28px 32px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+
+  header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+  }
+
+  .controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .search-box {
+    flex: 1;
+    min-width: 200px;
+    padding: 9px 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    outline: none;
+    transition: background 0.2s;
+  }
+  .search-box::placeholder { color: rgba(255,255,255,0.55); }
+  .search-box:focus { background: rgba(255,255,255,0.25); }
+
+  .filter-btn {
+    padding: 7px 14px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    background: transparent;
+    color: rgba(255,255,255,0.8);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+  .filter-btn.active {
+    background: var(--med-blue);
+    border-color: var(--med-blue);
+    color: white;
+    font-weight: 600;
+  }
+
+  .stats {
+    display: flex;
+    gap: 20px;
+    padding: 12px 32px;
+    background: white;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .stats span { font-weight: 600; color: var(--dark-blue); }
+
+  main { max-width: 960px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  .position-section { margin-bottom: 32px; }
+
+  .position-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 3px solid var(--med-blue);
+    margin-bottom: 14px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .position-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--dark-blue);
+    flex: 1;
+  }
+  .position-header .count {
+    background: var(--light-blue);
+    color: var(--dark-blue);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 12px;
+  }
+  .position-header .toggle-icon {
+    color: var(--muted);
+    font-size: 14px;
+    transition: transform 0.2s;
+  }
+  .position-section.collapsed .toggle-icon { transform: rotate(-90deg); }
+  .position-section.collapsed .move-list { display: none; }
+
+  .move-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    transition: box-shadow 0.2s;
+  }
+  .move-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+  .move-card .move-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--dark-blue);
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .move-card .move-date {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .move-card .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .move-card .detail {
+    font-size: 13px;
+  }
+  .move-card .detail-label {
+    font-weight: 600;
+    color: var(--med-blue);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+  .move-card .detail-text { color: var(--text); }
+
+  .move-card .detail.full-width { grid-column: 1 / -1; }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .print-header { display: none; }
+
+  @media print {
+    header, .stats { position: static; }
+    .search-box, .filter-btn { display: none; }
+    .print-header { display: block; text-align: center; margin-bottom: 20px; }
+    .move-card { break-inside: avoid; page-break-inside: avoid; }
+    .position-section.collapsed .move-list { display: block !important; }
+  }
+
+  @media (max-width: 600px) {
+    .move-card .detail-grid { grid-template-columns: 1fr; }
+    header { padding: 16px; }
+    header h1 { font-size: 18px; }
+    main { padding: 16px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>BJJ TECHNIQUE JOURNAL</h1>
+  <div class="controls">
+    <input type="text" class="search-box" id="search" placeholder="Search moves, tips, positions...">
+    <div id="filters"></div>
+  </div>
+</header>
+
+<div class="stats" id="stats"></div>
+
+<main id="app"></main>
+
+<script>
+const techniques = {
+  "Closed Guard": [
+    {
+      name: "Scissor Sweep",
+      steps: "Grip collar + sleeve. Open guard, shin across belly. Kick top leg forward, pull bottom leg back. Come up to mount.",
+      tips: "Keep tight grip on collar. Time it when they posture up. Hip out slightly first.",
+      chains: "To: Mount attacks. From: Collar/sleeve guard",
+      date: "3/7/26"
+    },
+  ],
+  "Open Guard": [],
+  "Half Guard": [],
+  "Mount": [],
+  "Side Control": [
+    {
+      name: "Arm Triangle (Head and Arm Choke)",
+      steps: "From side control, use your chest/shoulder to push their near arm across their face and against their neck. Thread your choking arm under their head, connect your hands. Windshield wiper your leg over their belly, then squeeze.",
+      tips: "Works best when they're framing. Lift them up slightly and get your arm deeper under their body. Back your shoulder out then reset it under their chin. Don't sprawl - windshield wiper the leg.",
+      chains: "From: Side control, mount. To: Mount if they escape early.",
+      date: "3/7/26"
+    },
+    {
+      name: "Reverse Triangle",
+      steps: "From side control, slide near-side knee up by their head. Thread leg under head/neck. Swing far leg over and lock triangle with legs around head and arm. Squeeze knees and extend hips.",
+      tips: "Control far arm first so it stays trapped. Angle toward trapped arm side for tighter finish.",
+      chains: "From: Side control, north-south. To: Armbar on trapped arm.",
+      date: "3/7/26"
+    },
+  ],
+  "Back Control": [],
+  "Turtle": [],
+  "Standing / Takedowns": [],
+  "Leg Locks": [],
+  "Other": [],
+};
+
+const positions = Object.keys(techniques);
+let activeFilter = "All";
+let searchQuery = "";
+
+function render() {
+  const app = document.getElementById("app");
+  const filtersEl = document.getElementById("filters");
+  const statsEl = document.getElementById("stats");
+  const allPositions = ["All", ...positions];
+  filtersEl.innerHTML = allPositions.map(p => `<button class="filter-btn ${activeFilter === p ? 'active' : ''}" data-filter="${p}">${p}${p !== "All" ? ` (${techniques[p].length})` : ''}</button>`).join("");
+  filtersEl.querySelectorAll(".filter-btn").forEach(btn => { btn.addEventListener("click", () => { activeFilter = btn.dataset.filter; render(); }); });
+  const totalMoves = positions.reduce((sum, p) => sum + techniques[p].length, 0);
+  const filledPositions = positions.filter(p => techniques[p].length > 0).length;
+  statsEl.innerHTML = `<div><span>${totalMoves}</span> moves logged</div><div><span>${filledPositions}</span> of ${positions.length} positions covered</div>`;
+  const query = searchQuery.toLowerCase();
+  let html = "";
+  let visibleMoves = 0;
+  for (const pos of positions) {
+    if (activeFilter !== "All" && activeFilter !== pos) continue;
+    const moves = techniques[pos].filter(m => !query || (m.name + m.steps + m.tips + m.chains).toLowerCase().includes(query));
+    if (query && moves.length === 0) continue;
+    visibleMoves += moves.length;
+    html += `<div class="position-section" id="section-${pos.replace(/[^a-z]/gi, '')}"><div class="position-header" onclick="this.parentElement.classList.toggle('collapsed')"><h2>${pos}</h2><span class="count">${moves.length} move${moves.length !== 1 ? 's' : ''}</span><span class="toggle-icon">&#9660;</span></div><div class="move-list">`;
+    if (moves.length === 0) html += `<div class="empty-state">No moves logged yet</div>`;
+    for (const m of moves) {
+      html += `<div class="move-card"><div class="move-name">${m.name} <span class="move-date">${m.date}</span></div><div class="detail-grid"><div class="detail full-width"><div class="detail-label">Steps</div><div class="detail-text">${m.steps}</div></div><div class="detail"><div class="detail-label">Key Details & Tips</div><div class="detail-text">${m.tips}</div></div><div class="detail"><div class="detail-label">Chains To / From</div><div class="detail-text">${m.chains}</div></div></div></div>`;
+    }
+    html += `</div></div>`;
+  }
+  if (query && visibleMoves === 0) html = `<div class="empty-state">No moves matching "${searchQuery}"</div>`;
+  app.innerHTML = html;
+}
+document.getElementById("search").addEventListener("input", (e) => { searchQuery = e.target.value; render(); });
+render();
+</script>
+</body>
+</html>
