@@ -184,6 +184,34 @@
     font-size: 15px;
   }
 
+  .view-toggle {
+    padding: 7px 14px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    background: transparent;
+    color: rgba(255,255,255,0.8);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    margin-right: 4px;
+  }
+  .view-toggle:hover { background: rgba(255,255,255,0.1); color: white; }
+  .view-toggle.active {
+    background: #e8a030;
+    border-color: #e8a030;
+    color: white;
+    font-weight: 600;
+  }
+
+  .move-card.compact { padding: 10px 20px; }
+  .move-card.compact .move-name { margin-bottom: 4px; font-size: 15px; }
+  .move-card.compact .quick-ref {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
   .print-header { display: none; }
 
   @media print {
@@ -220,6 +248,7 @@
 <header>
   <h1>BJJ TECHNIQUE JOURNAL</h1>
   <div class="controls">
+    <button class="view-toggle" id="compactToggle" title="Quick review mode">Quick Review</button>
     <input type="text" class="search-box" id="search" placeholder="Search moves, tips, positions...">
     <div id="filters"></div>
   </div>
@@ -238,20 +267,63 @@ const techniques = {
   "Closed Guard": [
     {
       name: "Scissor Sweep",
+      quick: "Collar + sleeve grip, shin across belly, kick & pull to roll them — come up to mount.",
       steps: "Grip collar + sleeve. Open guard, shin across belly. Kick top leg forward, pull bottom leg back. Come up to mount.",
       tips: "Keep tight grip on collar. Time it when they posture up. Hip out slightly first.",
       chains: "To: Mount attacks. From: Collar/sleeve guard",
       date: "3/7/26"
     },
+    {
+      name: "Hip Bump Sweep",
+      quick: "Pull them down, grab opposite arm, post & bump hips HIGH into chest to roll them over.",
+      steps: "From closed guard, pull the opponent down toward you to break their posture. Grab their arm with your opposite hand (e.g., grab their right arm with your left hand). Open your guard, post on your free hand behind you, and hip bump up high into them — drive your hips up and into their chest. Use the momentum to roll them over to the side of the arm you're controlling. Follow through and come up on top to mount.",
+      tips: "The bump needs to go up HIGH — aim for their chest/shoulder, not just forward. Controlling the arm is what prevents them from posting to stop the sweep. Time it when they're sitting upright with good posture — that's when they're most off-balance for this.",
+      chains: "From: Closed guard. To: Mount, Kimura (if they post their hand to defend).",
+      date: "3/14/26"
+    },
+    {
+      name: "Kimura (from Closed Guard)",
+      quick: "Same-side wrist grip, wrap other arm for figure-four, pull back while blocking their body.",
+      steps: "From closed guard, open your guard. Grab their right wrist with your right hand (same side grip). Wrap your left arm over and around their right arm, reaching under to grab your own right wrist — locking in the figure-four/kimura grip. Pull their arm back while using your body/legs to block them from closing the distance and driving into you. Finish by rotating their wrist behind their back.",
+      tips: "Same-side grip to grab the wrist first (right hand grabs their right arm), then your left arm wraps around. Blocking their body from coming in is key — if they stack you it falls apart. Use your legs and hips to create a wall so they can't pressure forward.",
+      chains: "From: Closed guard, hip bump sweep (if they post to defend). To: Can transition to hip bump sweep if they resist, or guillotine if they duck under.",
+      date: "3/14/26"
+    },
+    {
+      name: "Armbar (from Closed Guard)",
+      quick: "Pull arm across, climb guard high over elbow, leg over neck — legs UNCROSSED, squeeze knees, hips up.",
+      steps: "From closed guard, use both hands to grab one of their arms and pull it across to the opposite side of your body. Scoot your hips up and climb your closed guard high on their back so that it's over their elbow — this isolates the arm. Once everything is in position, open your guard and pull your left leg over their neck, draping it across. Keep your legs UNCROSSED, squeeze your knees together tight around their arm and head, hips up into their elbow to hyperextend and finish.",
+      tips: "DO NOT cross your legs — keep them uncrossed and squeeze your knees tight. Pulling the arm across with both hands is the setup that makes everything else possible. Climbing your guard up high over the elbow is key — if it's too low on their arm you won't be able to lock it up. Pinch your knees and keep your hips raised for maximum pressure on the elbow.",
+      chains: "From: Closed guard. To: Omoplata (if they pull arm out).",
+      date: "3/14/26"
+    },
+    {
+      name: "Omoplata",
+      quick: "From armbar — they pull arm out, grab their arm, push head down, keep arm at hip, raise hips to finish.",
+      steps: "When they pull their arm free from your armbar attempt, they leave their head and one arm still between your legs. Grab their remaining arm and push their head down with your hand. Keep their trapped arm controlled tight toward your hip. Raise your hips up to apply pressure on their shoulder and finish.",
+      tips: "This is the natural counter when they escape the armbar by pulling their arm out — don't panic, just transition. Push the head down to break their posture so they can't stack you. Keep their arm pinned toward your hip so it stays trapped. The finish comes from raising your hips to crank the shoulder.",
+      chains: "From: Armbar attempt (opponent pulls arm free). To: Armbar (if they try to posture out), sweep if they roll.",
+      date: "3/14/26"
+    },
   ],
 
   "Open Guard": [],
   "Half Guard": [],
-  "Mount": [],
+  "Mount": [
+    {
+      name: "Cross Collar Choke (from Mount)",
+      quick: "Hand deep in opposite collar, other hand around head thumb into other side, curl wrists in, head down.",
+      steps: "From mount, reach your hand across and grip deep into the back of their collar on the opposite side (palm up, fingers inside the collar). Reach your other hand around their head and stick your thumb into the collar on the other side. Curl both wrists inward and pull your elbows down while putting your head down on the mat beside theirs to keep your weight low and prevent them from pushing you off.",
+      tips: "Get that first grip DEEP into the collar — the deeper the grip, the tighter the choke. Put your head down to stay heavy and make it harder for them to bridge you off. The finish is in curling the wrists and pulling, not squeezing with your arms. Keep your elbows tight.",
+      chains: "From: Mount. To: Armbar (if they reach up to defend), americana (if they push on your chest).",
+      date: "3/14/26"
+    },
+  ],
 
   "Side Control": [
     {
       name: "Arm Triangle (Head and Arm Choke)",
+      quick: "Push their arm across their neck, thread arm under head, gable grip, windshield wiper leg over, squeeze.",
       steps: "From side control, use your chest/shoulder to push their near arm across their face and against their neck. Thread your choking arm under their head, connect your hands (gable grip or palm-to-palm). Their arm blocks one side of the neck, your shoulder pressures the other side. Windshield wiper your leg over their belly, then squeeze.",
       tips: "Works best when they're framing — push their arm down across their neck. Lift them up slightly and get your arm deeper under their body to create more pressure. To get your shoulder in the right spot under their chin, back it out first then reset it into place. Windshield wiper the leg over their belly to lock in the finish — don't sprawl. Keep your head low. Squeeze elbows together, not just your arms.",
       chains: "From: Side control, mount. To: Can transition to mount if they escape early.",
@@ -259,16 +331,66 @@ const techniques = {
     },
     {
       name: "Reverse Triangle",
+      quick: "Knee up by head, thread leg under neck, lock figure-four, rotate toward north-south to finish.",
       steps: "From side control, slide your near-side knee up by their head. Thread that leg under their head/neck. Swing your far leg over and lock a triangle (figure-four) with your legs around their head and arm. To finish: cross your legs and begin turning toward north-south — as you rotate, the triangle tightens. Squeeze knees together and extend hips.",
       tips: "Control their far arm first so it stays trapped inside the triangle. Use your hands to control posture while locking legs. The finish comes as you turn — cross your legs and let the rotation do the work as you move to north-south. Angle slightly toward their trapped arm side for a tighter squeeze.",
       chains: "From: Side control, north-south. To: Can transition to armbar on trapped arm.",
       date: "3/7/26"
     },
+    {
+      name: "Americana (Keylock)",
+      quick: "Arm past head, pull elbow in then push wrist down, figure-four grip, slide wrist to hip.",
+      steps: "Secure side control. Slide your left arm past their head to the far side. To isolate their arm, use your right hand to pull their elbow in toward you, then push down on their wrist with your left hand to pin it to the mat. Once their arm is flat, grab their wrist with your left hand (thumb pointing toward their feet), slide your right hand under their arm and grab your own wrist (figure-four grip). Keep their elbow pinned tight to the mat and slide their wrist toward their hip to finish.",
+      tips: "The key to getting the arm down is pulling the elbow in first with your right hand — don't just try to push the wrist down by itself. Keep heavy chest pressure throughout so they can't create space. Their elbow needs to stay glued to the mat for the finish to work.",
+      chains: "From: Side control. To: Straight armlock (if they straighten the arm), Kimura (if they tuck the arm in).",
+      date: "3/13/26"
+    },
+    {
+      name: "Straight Armbar (from Americana defense)",
+      quick: "They straighten arm — left hand on wrist, right forearm over elbow (thumb up), press down.",
+      steps: "When they defend the Americana by straightening their arm out, keep your left hand on their wrist to control it. Place your right forearm over the top of their elbow with your thumb facing up. Their arm should be straight with your forearm acting as the fulcrum on top of their elbow. Apply downward pressure with your right forearm on their elbow while keeping their wrist controlled with your left hand to hyperextend the arm.",
+      tips: "Left hand stays on the wrist the whole time — don't let go. Right arm goes OVER the elbow with thumb up, that's the key grip. The pressure comes from pushing down on the elbow against the wrist control, not from squeezing.",
+      chains: "From: Americana attempt (opponent straightens arm to defend). To: Can go back to Americana if they bend the arm again.",
+      date: "3/14/26"
+    },
+    {
+      name: "Kimura (from Americana defense)",
+      quick: "They tuck arm — grab kimura grip, knee on belly, step over head, sit and finish.",
+      steps: "When they defend the Americana by tucking their arm in tight, grab their wrist with your far hand. Secure a kimura grip (figure-four on their wrist). Transition to knee on belly to create space and control. Step your leg over their head and sit down, trapping their arm between your legs. Finish the kimura by rotating their wrist behind their back.",
+      tips: "This is the counter when they bend and tuck the arm to defend the Americana — let them tuck it and use that against them. The knee on belly transition is important for creating the angle and control you need. When you step over the head and sit, keep the grip tight the whole time so they can't pull free during the transition.",
+      chains: "From: Americana attempt (opponent tucks arm to defend). To: Can transition back to side control if grip is lost.",
+      date: "3/13/26"
+    },
   ],
 
   "Back Control": [],
   "Turtle": [],
-  "Standing / Takedowns": [],
+  "Standing / Takedowns": [
+    {
+      name: "O Soto Gari (Major Outer Reap)",
+      quick: "Sleeve + collar grip, lift, step past, reap their leg back while upper body drives forward — rotate as one.",
+      steps: "Grip their left sleeve with your right hand and their right collar with your left hand. Lift up on the grips to get them light on their feet. Step past them with your left foot, planting it beside or behind them. Your right foot comes in and kicks/reaps their leg back. At the same time, your upper body drives forward — your sleeve-gripping arm pushes them backward. Your whole body rotates as one unit: legs sweep back, upper body drives forward, turning them over.",
+      tips: "The upper and lower body work in opposite directions — that rotation is what makes it work. Lifting up on the grips first gets their weight off their heels so the reap is effective. The step past with your left foot is what gives you the angle — don't try to reap from square on. Commit to the rotation, half-hearted attempts won't get them down.",
+      chains: "From: Standing, collar and sleeve grip. To: Side control, top position.",
+      date: "3/14/26"
+    },
+    {
+      name: "O Goshi (Hip Toss)",
+      quick: "Sleeve + collar, bump hips & turn your back into them at same time, pull over hip, drop to knees.",
+      steps: "Grip their sleeve and collar. Bump your hips into them while turning your back to them — the hip bump and the turn happen at the same time. Your hips should be lower than theirs and loaded under their center of gravity. As you rotate, pull them over your hip using your grips. Drop to your knees as they go over to complete the throw.",
+      tips: "Everything happens at once — the hip bump, the turn, and the pull are one motion, not three separate steps. Get your hips LOW and deep under them. Dropping to your knees at the end helps you stay in control and not get pulled over with them. Commit to the turn — if you hesitate halfway through you'll get stuck with your back to them.",
+      chains: "From: Standing, collar and sleeve grip. To: Side control, mount.",
+      date: "3/14/26"
+    },
+    {
+      name: "Body Lock Takedown",
+      quick: "Wrap waist, pull hips in while driving chest into them — push-pull to break balance, push over.",
+      steps: "Close the distance and wrap your arms around their waist in a body lock. Pull their hips toward you while driving your upper body / chest into them — this creates a push-pull that breaks their balance. Once they're off-balance and leaning back, push them over and follow them to the ground.",
+      tips: "The push-pull is what makes this work — pull their waist IN while pushing your chest INTO them at the same time. This creates opposite forces that tip them backward. Don't just try to muscle them over, get them off-balance first then the finish is easy. Keep your head tight to their body so you don't get guillotined on the way in.",
+      chains: "From: Standing, clinch range. To: Side control, top position.",
+      date: "3/14/26"
+    },
+  ],
   "Leg Locks": [],
   "Other": [],
 };
@@ -279,6 +401,7 @@ const techniques = {
 const positions = Object.keys(techniques);
 let activeFilter = "All";
 let searchQuery = "";
+let compactMode = false;
 
 function render() {
   const app = document.getElementById("app");
@@ -333,23 +456,30 @@ function render() {
     }
 
     for (const m of moves) {
-      html += `<div class="move-card">
-        <div class="move-name">${highlight(m.name, query)} <span class="move-date">${m.date}</span></div>
-        <div class="detail-grid">
-          <div class="detail full-width">
-            <div class="detail-label">Steps</div>
-            <div class="detail-text">${highlight(m.steps, query)}</div>
+      if (compactMode) {
+        html += `<div class="move-card compact">
+          <div class="move-name">${highlight(m.name, query)} <span class="move-date">${m.date}</span></div>
+          <div class="quick-ref">${highlight(m.quick || m.steps, query)}</div>
+        </div>`;
+      } else {
+        html += `<div class="move-card">
+          <div class="move-name">${highlight(m.name, query)} <span class="move-date">${m.date}</span></div>
+          <div class="detail-grid">
+            <div class="detail full-width">
+              <div class="detail-label">Steps</div>
+              <div class="detail-text">${highlight(m.steps, query)}</div>
+            </div>
+            <div class="detail">
+              <div class="detail-label">Key Details & Tips</div>
+              <div class="detail-text">${highlight(m.tips, query)}</div>
+            </div>
+            <div class="detail">
+              <div class="detail-label">Chains To / From</div>
+              <div class="detail-text">${highlight(m.chains, query)}</div>
+            </div>
           </div>
-          <div class="detail">
-            <div class="detail-label">Key Details & Tips</div>
-            <div class="detail-text">${highlight(m.tips, query)}</div>
-          </div>
-          <div class="detail">
-            <div class="detail-label">Chains To / From</div>
-            <div class="detail-text">${highlight(m.chains, query)}</div>
-          </div>
-        </div>
-      </div>`;
+        </div>`;
+      }
     }
 
     html += `</div></div>`;
@@ -370,6 +500,12 @@ function highlight(text, query) {
 
 document.getElementById("search").addEventListener("input", (e) => {
   searchQuery = e.target.value;
+  render();
+});
+
+document.getElementById("compactToggle").addEventListener("click", () => {
+  compactMode = !compactMode;
+  document.getElementById("compactToggle").classList.toggle("active", compactMode);
   render();
 });
 
