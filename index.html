@@ -275,11 +275,19 @@ const techniques = {
     },
     {
       name: "Hip Bump Sweep",
-      quick: "Pull them down, grab opposite arm, post & bump hips HIGH into chest to roll them over.",
-      steps: "From closed guard, pull the opponent down toward you to break their posture. Grab their arm with your opposite hand (e.g., grab their right arm with your left hand). Open your guard, post on your free hand behind you, and hip bump up high into them — drive your hips up and into their chest. Use the momentum to roll them over to the side of the arm you're controlling. Follow through and come up on top to mount.",
-      tips: "The bump needs to go up HIGH — aim for their chest/shoulder, not just forward. Controlling the arm is what prevents them from posting to stop the sweep. Time it when they're sitting upright with good posture — that's when they're most off-balance for this.",
-      chains: "From: Closed guard. To: Mount, Kimura (if they post their hand to defend).",
-      date: "3/14/26"
+      quick: "From holding head down — post up all the way on your arm, hip bump HIGH, step far forward to trap arms in mount.",
+      steps: "From closed guard with your opponent's head controlled down, release the head and post up on your hand behind you — get ALL the way up onto your arm. Hip bump up high into their chest to off-balance them. As they go over, step your foot far forward so that when you land in mount, their arms are trapped underneath you.",
+      tips: "Get up ALL the way on your arm when you post — don't stop halfway. The hip bump goes UP and HIGH into their chest. Step far forward as you come up to mount so their arms get pinned — this is key to securing the position. If they push you back down after the bump attempt, kick their leg out on the side you were sweeping toward and you can still complete the sweep.",
+      chains: "From: Closed guard (head control position). To: Mount (arms trapped), Guillotine (if you sit up and they leave their neck open). If they push you back down: kick their leg out and sweep anyway.",
+      date: "3/16/26"
+    },
+    {
+      name: "Guillotine (from Closed Guard)",
+      quick: "From hip bump position — release their arm, reach around neck, pull elbow down and in, close guard to finish.",
+      steps: "From closed guard, sit up into the hip bump sweep position where you're controlling their arm. Release the arm grip and reach that hand around their neck to lock in the guillotine. Close your guard so they can't escape. Pull your elbow down and in to finish the choke. If the guillotine isn't working, let it go and chain directly into the hip bump sweep instead.",
+      tips: "The transition is from grabbing their arm (hip bump setup) to reaching around their neck — that's the key switch. Pull the elbow DOWN and IN to finish — that's where the squeeze comes from. Close your legs tight so they can't pull out. If the guillotine fails, don't hang onto it forever — transition straight to the hip bump sweep while you still have the momentum from sitting up.",
+      chains: "From: Closed guard (hip bump position, opponent leaves neck open). To: Finish the choke, or hip bump sweep if guillotine fails.",
+      date: "3/16/26"
     },
     {
       name: "Kimura (from Closed Guard)",
@@ -390,6 +398,22 @@ const techniques = {
       chains: "From: Standing, clinch range. To: Side control, top position.",
       date: "3/14/26"
     },
+    {
+      name: "Koshi Guruma (Hip Wheel Throw)",
+      quick: "Cross-grip their arm over your shoulder, wrap head & grab lat, load on hip, roll them off.",
+      steps: "Grab your opponent's same-side arm with a cross grip (your right hand grabs their right arm). Pull their arm up and over your shoulder. With your other arm, wrap around their head and grab their lat to lock them tight against you. Turn in so your hips are past their body and your legs face the same direction as theirs. Load them onto your hip by getting your hips low and underneath them, then lift and roll them off your hip to complete the throw.",
+      tips: "Your hips MUST be past their body — if they're not deep enough the throw won't work. Your legs should be facing the same direction as theirs when you load up. The wrap around the head and lat grip is what separates this from O Goshi (which goes under the arm). Commit to getting your hips through.",
+      chains: "From: Standing, cross grip. To: Side control, top position. Alt: Ko Soto Gake if they step around.",
+      date: "3/16/26"
+    },
+    {
+      name: "Ko Soto Gake (Minor Outer Hook) — Koshi Guruma Follow-up",
+      quick: "They step around your hip throw — wrap your knee around their leg, hop into them, finish the takedown.",
+      steps: "When you attempt Koshi Guruma and your opponent steps around to avoid the throw, take your near-side knee and wrap it around the back of their leg. Hop into them to off-balance them while keeping your upper body grips. The hook on their leg combined with your forward pressure takes them down.",
+      tips: "This is the answer when they defend the hip throw by stepping around — don't abandon the takedown, just switch to the hook. The knee wrap and the hop happen together. Keep your grips and upper body pressure so they can't just pull away.",
+      chains: "From: Koshi Guruma defense (opponent steps around). To: Top position, side control.",
+      date: "3/16/26"
+    },
   ],
   "Leg Locks": [],
   "Other": [],
@@ -415,101 +439,4 @@ function render() {
   ).join("");
 
   filtersEl.querySelectorAll(".filter-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      activeFilter = btn.dataset.filter;
-      render();
-    });
-  });
-
-  // Stats
-  const totalMoves = positions.reduce((sum, p) => sum + techniques[p].length, 0);
-  const filledPositions = positions.filter(p => techniques[p].length > 0).length;
-  statsEl.innerHTML = `<div><span>${totalMoves}</span> moves logged</div><div><span>${filledPositions}</span> positions covered</div>`;
-
-  // Filter & search
-  const query = searchQuery.toLowerCase();
-  let html = "";
-  let visibleMoves = 0;
-
-  for (const pos of positions) {
-    if (activeFilter !== "All" && activeFilter !== pos) continue;
-
-    const moves = techniques[pos].filter(m => {
-      if (!query) return true;
-      return (m.name + m.steps + m.tips + m.chains).toLowerCase().includes(query);
-    });
-
-    if (query && moves.length === 0) continue;
-
-    visibleMoves += moves.length;
-
-    html += `<div class="position-section" id="section-${pos.replace(/[^a-z]/gi, '')}">
-      <div class="position-header" onclick="this.parentElement.classList.toggle('collapsed')">
-        <h2>${pos}</h2>
-        <span class="count">${moves.length} move${moves.length !== 1 ? 's' : ''}</span>
-        <span class="toggle-icon">▼</span>
-      </div>
-      <div class="move-list">`;
-
-    if (moves.length === 0) {
-      html += `<div class="empty-state">No moves logged yet</div>`;
-    }
-
-    for (const m of moves) {
-      if (compactMode) {
-        html += `<div class="move-card compact">
-          <div class="move-name">${highlight(m.name, query)} <span class="move-date">${m.date}</span></div>
-          <div class="quick-ref">${highlight(m.quick || m.steps, query)}</div>
-        </div>`;
-      } else {
-        html += `<div class="move-card">
-          <div class="move-name">${highlight(m.name, query)} <span class="move-date">${m.date}</span></div>
-          <div class="detail-grid">
-            <div class="detail full-width">
-              <div class="detail-label">Steps</div>
-              <div class="detail-text">${highlight(m.steps, query)}</div>
-            </div>
-            <div class="detail">
-              <div class="detail-label">Key Details & Tips</div>
-              <div class="detail-text">${highlight(m.tips, query)}</div>
-            </div>
-            <div class="detail">
-              <div class="detail-label">Chains To / From</div>
-              <div class="detail-text">${highlight(m.chains, query)}</div>
-            </div>
-          </div>
-        </div>`;
-      }
-    }
-
-    html += `</div></div>`;
-  }
-
-  if (query && visibleMoves === 0) {
-    html = `<div class="empty-state">No moves matching "${searchQuery}"</div>`;
-  }
-
-  app.innerHTML = html;
-}
-
-function highlight(text, query) {
-  if (!query) return text;
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-  return text.replace(regex, '<mark style="background:#ffe066;padding:0 2px;border-radius:2px">$1</mark>');
-}
-
-document.getElementById("search").addEventListener("input", (e) => {
-  searchQuery = e.target.value;
-  render();
-});
-
-document.getElementById("compactToggle").addEventListener("click", () => {
-  compactMode = !compactMode;
-  document.getElementById("compactToggle").classList.toggle("active", compactMode);
-  render();
-});
-
-render();
-</script>
-</body>
-</html>
+    btn.addEventListener("click", () =
