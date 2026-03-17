@@ -320,11 +320,11 @@ const techniques = {
   "Mount": [
     {
       name: "Cross Collar Choke (from Mount)",
-      quick: "Hand deep in opposite collar, other hand around head thumb into other side, curl wrists in, head down.",
-      steps: "From mount, reach your hand across and grip deep into the back of their collar on the opposite side (palm up, fingers inside the collar). Reach your other hand around their head and stick your thumb into the collar on the other side. Curl both wrists inward and pull your elbows down while putting your head down on the mat beside theirs to keep your weight low and prevent them from pushing you off.",
-      tips: "Get that first grip DEEP into the collar — the deeper the grip, the tighter the choke. Put your head down to stay heavy and make it harder for them to bridge you off. The finish is in curling the wrists and pulling, not squeezing with your arms. Keep your elbows tight.",
+      quick: "Right hand deep in back of collar (leave slack), left hand around head thumb-in on other side, head forward, turn wrists to ceiling, elbows tight.",
+      steps: "From mount, reach your right arm across to the back of their gi and grab the collar — leave a little slack in the grip, don't cinch it all the way tight yet. Reach your left arm around their head and stick your thumb into the gi on the other side of the collar, then grab the gi. To finish, put your head forward and down, turn both wrists toward the ceiling, keep your elbows tucked in tight, and pull.",
+      tips: "Leave a little slack on that first (right hand) grip — if you death-grip it immediately you won't have room to work the second hand in. The finish is turning your wrists toward the ceiling, not just squeezing — that's what closes the choke. Keep your elbows tucked tight to your body the whole time. Head goes forward and down to stay heavy and prevent them from pushing you off.",
       chains: "From: Mount. To: Armbar (if they reach up to defend), americana (if they push on your chest).",
-      date: "3/14/26"
+      date: "3/17/26"
     },
   ],
 
@@ -439,4 +439,101 @@ function render() {
   ).join("");
 
   filtersEl.querySelectorAll(".filter-btn").forEach(btn => {
-    btn.addEventListener("click", () =
+    btn.addEventListener("click", () => {
+      activeFilter = btn.dataset.filter;
+      render();
+    });
+  });
+
+  // Stats
+  const totalMoves = positions.reduce((sum, p) => sum + techniques[p].length, 0);
+  const filledPositions = positions.filter(p => techniques[p].length > 0).length;
+  statsEl.innerHTML = `<div><span>${totalMoves}</span> moves logged</div><div><span>${filledPositions}</span> positions covered</div>`;
+
+  // Filter & search
+  const query = searchQuery.toLowerCase();
+  let html = "";
+  let visibleMoves = 0;
+
+  for (const pos of positions) {
+    if (activeFilter !== "All" && activeFilter !== pos) continue;
+
+    const moves = techniques[pos].filter(m => {
+      if (!query) return true;
+      return (m.name + m.steps + m.tips + m.chains).toLowerCase().includes(query);
+    });
+
+    if (query && moves.length === 0) continue;
+
+    visibleMoves += moves.length;
+
+    html += `<div class="position-section" id="section-${pos.replace(/[^a-z]/gi, '')}">
+      <div class="position-header" onclick="this.parentElement.classList.toggle('collapsed')">
+        <h2>${pos}</h2>
+        <span class="count">${moves.length} move${moves.length !== 1 ? 's' : ''}</span>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="move-list">`;
+
+    if (moves.length === 0) {
+      html += `<div class="empty-state">No moves logged yet</div>`;
+    }
+
+    for (const m of moves) {
+      if (compactMode) {
+        html += `<div class="move-card compact">
+          <div class="move-name">${highlight(m.name, query)} <span class="move-date">${m.date}</span></div>
+          <div class="quick-ref">${highlight(m.quick || m.steps, query)}</div>
+        </div>`;
+      } else {
+        html += `<div class="move-card">
+          <div class="move-name">${highlight(m.name, query)} <span class="move-date">${m.date}</span></div>
+          <div class="detail-grid">
+            <div class="detail full-width">
+              <div class="detail-label">Steps</div>
+              <div class="detail-text">${highlight(m.steps, query)}</div>
+            </div>
+            <div class="detail">
+              <div class="detail-label">Key Details & Tips</div>
+              <div class="detail-text">${highlight(m.tips, query)}</div>
+            </div>
+            <div class="detail">
+              <div class="detail-label">Chains To / From</div>
+              <div class="detail-text">${highlight(m.chains, query)}</div>
+            </div>
+          </div>
+        </div>`;
+      }
+    }
+
+    html += `</div></div>`;
+  }
+
+  if (query && visibleMoves === 0) {
+    html = `<div class="empty-state">No moves matching "${searchQuery}"</div>`;
+  }
+
+  app.innerHTML = html;
+}
+
+function highlight(text, query) {
+  if (!query) return text;
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return text.replace(regex, '<mark style="background:#ffe066;padding:0 2px;border-radius:2px">$1</mark>');
+}
+
+document.getElementById("search").addEventListener("input", (e) => {
+  searchQuery = e.target.value;
+  render();
+});
+
+document.getElementById("compactToggle").addEventListener("click", () => {
+  compactMode = !compactMode;
+  document.getElementById("compactToggle").classList.toggle("active", compactMode);
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
